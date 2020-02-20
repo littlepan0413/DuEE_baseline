@@ -9,20 +9,20 @@ EE-Baseline是在事件抽取数据集（DuEE 1.0）上进行事件抽取的基�
 基于序列标注的触发词抽取模型是整体模型的一部分，该部分主要是给定事件类型，识别句子中出现的事件触发词对应的位置以及对应的事件类别，该模型是基于ERNIE开发序列标注模型，采用ERNIE+CRF实现，模型原理图如下：
 
 <div align="center">
-<img src="pictures/trigger_model.png" width="600" height="500" alt="基于序列标注的触发词抽取模型" align=center />
+<img src="pictures/trigger_model.png" width="500" height="400" alt="基于序列标注的触发词抽取模型" align=center />
 </div>
 
-上述样例中模型通过模型识别出触发词"求婚"，并分配给"B-结婚"、"I-结婚"标签，最终可以得到该句子中包含 “结婚”事件类型。
+> 上述样例中模型通过模型识别出触发词"求婚"，并分配给"B-结婚"、"I-结婚"标签，最终可以得到该句子中包含 “结婚”事件类型。
 
 #### 基于序列标注的论元角色识别模型
 
 基于序列标注的论元抽取模型也是整体模型的一部分，该部分主要是识别出事件中的论元以及对应论元角色，该模型是基于ERNIE开发序列标注模型，采用ERNIE+CRF实现，模型原理图如下：
 
 <div align="center">
-<img src="pictures/role_model.png" width="600" height="500" alt="基于序列标注的论元抽取模型" align=center />
+<img src="pictures/role_model.png" width="500" height="400" alt="基于序列标注的论元抽取模型" align=center />
 </div>
 
-上述样例中模型通过模型识别出：1）论元"李荣浩"，并分配标签"B-求婚者"、"I-求婚者"、"I-求婚者"；2）论元"杨丞琳", 并分配标签"B-求婚对象"、"I-求婚对象"、"I-求婚对象"。最终识别出句子中包含的论元角色和论元对是<求婚者，李荣浩>、<求婚对象，杨丞琳>
+> 上述样例中模型通过模型识别出：1）论元"李荣浩"，并分配标签"B-求婚者"、"I-求婚者"、"I-求婚者"；2）论元"杨丞琳", 并分配标签"B-求婚对象"、"I-求婚对象"、"I-求婚对象"。最终识别出句子中包含的论元角色和论元对是<求婚者，李荣浩>、<求婚对象，杨丞琳>
 
 #### 识别结果处理策略
 
@@ -72,7 +72,7 @@ sh bin/script/train_and_eval.sh
 cd ./model  # 所有模型保存目录
 wget https://ernie.bj.bcebos.com/ERNIE_1.0_max-len-512.tar.gz --no-check-certificate
 mkdir ERNIE_1.0_max-len-512  # ernie模型保存目录
-tar -zxvf ERNIE_1.0_max-len-512.tar.gz -C ERNIE_1.0_max-len-512 
+tar -zxvf ERNIE_1.0_max-len-512.tar.gz -C ERNIE_1.0_max-len-512
 ```
 
 在 `./model/ERNIE_1.0_max-len-512/` 目录下保存了预训练模型的参数文件目录( `params/`)、词汇表(`vocab.txt`)、模型配置(`ernie_config.json`)
@@ -180,7 +180,7 @@ sh script/predict_event_role.sh ${GPUID} ${DATA_DIR} ${PRETRAIN_MODEL} ${ROLE_SA
 python bin/predict_eval_process.py test_data_2_eval ./data/test.json ./result/gold.json
 ```
 
-- 将预测结果整合并转为评估格式 
+- 将预测结果整合并转为评估格式
 
 需要触发词预测结果（`./save_model/trigger/pred_trigger.json`）、论元角色预测结果（`./save_model/role/pred_role.json`）、事件schema文件（`./dict/event_schema.json`）,保存到预测结果文件 `./result/pred.json`
 
