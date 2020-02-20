@@ -1,3 +1,5 @@
+English | [简体中文](./README.zh.md)
+
 # 事件抽取基线模型 (EE-Baseline)
 
 EE-Baseline是在事件抽取数据集（DuEE 1.0）上进行事件抽取的基线模型，该模型采用基于[ERNIE](https://github.com/PaddlePaddle/ERNIE)的序列标注（sequence labeling）方案，分为基于序列标注的触发词抽取模型和基于序列标注的论元抽取模型，属于PipeLine模型；基于序列标注的触发词抽取模型采用BIO方式，识别触发词的位置以及对应的事件类型，基于序列标注的论元抽取模型采用BIO方式识别出事件中的论元以及对应的论元角色。
