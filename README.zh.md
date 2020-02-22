@@ -4,7 +4,7 @@
 
 EE-Baseline是在事件抽取数据集（DuEE 1.0）上进行事件抽取的基线模型，该模型采用基于[ERNIE](https://github.com/PaddlePaddle/ERNIE)的序列标注（sequence labeling）方案，分为基于序列标注的触发词抽取模型和基于序列标注的论元抽取模型，属于PipeLine模型；基于序列标注的触发词抽取模型采用BIO方式，识别触发词的位置以及对应的事件类型，基于序列标注的论元抽取模型采用BIO方式识别出事件中的论元以及对应的论元角色。
 
-#### 基于序列标注的触发词识别模型
+#### 基于序列标注的触发词抽取模型
 
 基于序列标注的触发词抽取模型是整体模型的一部分，该部分主要是给定事件类型，识别句子中出现的事件触发词对应的位置以及对应的事件类别，该模型是基于ERNIE开发序列标注模型，采用ERNIE+CRF实现，模型原理图如下：
 
@@ -14,7 +14,7 @@ EE-Baseline是在事件抽取数据集（DuEE 1.0）上进行事件抽取的基�
 
 > 上述样例中模型通过模型识别出触发词"求婚"，并分配给"B-结婚"、"I-结婚"标签，最终可以得到该句子中包含 “结婚”事件类型。
 
-#### 基于序列标注的论元角色识别模型
+#### 基于序列标注的论元抽取模型
 
 基于序列标注的论元抽取模型也是整体模型的一部分，该部分主要是识别出事件中的论元以及对应论元角色，该模型是基于ERNIE开发序列标注模型，采用ERNIE+CRF实现，模型原理图如下：
 
@@ -22,9 +22,9 @@ EE-Baseline是在事件抽取数据集（DuEE 1.0）上进行事件抽取的基�
 <img src="pictures/role_model.png" width="500" height="400" alt="基于序列标注的论元抽取模型" align=center />
 </div>
 
-> 上述样例中模型通过模型识别出：1）论元"李荣浩"，并分配标签"B-求婚者"、"I-求婚者"、"I-求婚者"；2）论元"杨丞琳", 并分配标签"B-求婚对象"、"I-求婚对象"、"I-求婚对象"。最终识别出句子中包含的论元角色和论元对是<求婚者，李荣浩>、<求婚对象，杨丞琳>
+> 上述样例中通过模型识别出：1）论元"李荣浩"，并分配标签"B-求婚者"、"I-求婚者"、"I-求婚者"；2）论元"杨丞琳", 并分配标签"B-求婚对象"、"I-求婚对象"、"I-求婚对象"。最终识别出句子中包含的论元角色和论元对是<求婚者，李荣浩>、<求婚对象，杨丞琳>
 
-#### 识别结果处理策略
+#### 抽取结果处理策略
 
 根据触发词抽取模型识别到的事件类型对应的所有论元角色关联论元抽取模型的结果，得到最终模型的输出结果
 
@@ -48,16 +48,16 @@ pip install -r ./requirements.txt
 
 ##### 步骤1：训练数据处理
 
-包括下载预训练模型、数据处理成模型读入格式、处理事件schema生成触发词识别模型和论元角色识别模型需要的标签文档，对应详细步骤中的步骤1-3
+包括下载预训练模型、数据处理成模型读入格式、处理事件schema生成触发词抽取模型和论元抽取模型需要的标签文档，对应详细步骤中的步骤1-3
 
 ```shell
 sh bin/script/data_preparation.sh
 ```
 重新执行需要删除部分文件（ `./model/ERNIE_1.0_max-len-512.tar.gz`、`./data/train.json`、`./data/dev.json`、`./data/test.json`、`./dict/vocab_trigger_label_map.txt`、`./dict/vocab_roles_label_map.txt`）否则相应的处理过程将不执行
 
-##### 步骤2: 训练模型并评估效果
+##### 步骤2: 模型训练与结果处理
 
-包括触发词识别模型的训练和预测过程、论元角色识别模型的训练和预测过程、评估所需数据处理和进行评估，对应详细步骤中的步骤4-8
+包括触发词抽取模型的训练和预测过程、论元抽取模型的训练和预测过程、预测结果处理，对应详细步骤中的步骤4-8
 
 ```shell
 sh bin/script/train_and_eval.sh
@@ -88,19 +88,19 @@ python bin/data_process.py origin_events_process ./data/eet_events.json ./data/
 
 ##### 步骤3: 处理schema生成序列标注标签文档
 
-- 触发词识别模型标签，保存到文件 `./dict/vocab_trigger_label_map.txt`
+- 触发词抽取模型标签，保存到文件 `./dict/vocab_trigger_label_map.txt`
 
 ```python
 python bin/data_process.py schema_event_type_process ./dict/event_schema.json ./dict/vocab_trigger_label_map.txt
 ```
 
-- 论元角色识别模型标签，保存到文件 `./dict/vocab_roles_label_map.txt`
+- 论元抽取模型标签，保存到文件 `./dict/vocab_roles_label_map.txt`
 
 ```python
 python bin/data_process.py schema_role_process ./dict/event_schema.json ./dict/vocab_roles_label_map.txt
 ```
 
-##### 步骤4: 训练触发词识别模型
+##### 步骤4: 训练触发词抽取模型
 
 训练完成创建 `./save_model/trigger/final_model` 文件夹保存最终模型参数，每500步保存训练过程参数，测试集预测结果保存在 `./save_model/trigger/pred_trigger.json`
 
@@ -137,7 +137,7 @@ TRIGGER_SAVE_MODEL=${SAVE_MODEL}/trigger
 sh script/predict_event_trigger.sh ${GPUID} ${DATA_DIR} ${PRETRAIN_MODEL} ${TRIGGER_SAVE_MODEL}/final_model ${DICT}
 ```
 
-##### 步骤6: 训练论元角色识别模型
+##### 步骤6: 训练论元抽取模型
 
 训练完成创建 `./save_model/role/final_model` 文件夹保存最终模型参数，每500步保存训练过程参数，测试集预测结果保存在 `./save_model/role/pred_role.json`
 
@@ -173,7 +173,7 @@ ROLE_SAVE_MODEL=${SAVE_MODEL}/role
 sh script/predict_event_role.sh ${GPUID} ${DATA_DIR} ${PRETRAIN_MODEL} ${ROLE_SAVE_MODEL}/final_model ${DICT}
 ```
 
-##### 步骤8: 评估
+##### 步骤8: 预测结果处理
 
 - 将测试集（`./data/test.json`）转化为评估格式 `./result/gold.json`
 

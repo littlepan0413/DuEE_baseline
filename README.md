@@ -1,107 +1,104 @@
 English | [简体中文](./README.zh.md)
 
-# 事件抽取基线模型 (EE-Baseline)
+# Event Extraction Baseline model (EE-Baseline)
 
-EE-Baseline是在事件抽取数据集（DuEE 1.0）上进行事件抽取的基线模型，该模型采用基于[ERNIE](https://github.com/PaddlePaddle/ERNIE)的序列标注（sequence labeling）方案，分为基于序列标注的触发词抽取模型和基于序列标注的论元抽取模型，属于PipeLine模型；基于序列标注的触发词抽取模型采用BIO方式，识别触发词的位置以及对应的事件类型，基于序列标注的论元抽取模型采用BIO方式识别出事件中的论元以及对应的论元角色。
+EE-Baseline is a event extraction baseline model for the event extraction dataset ([DuEE 1.0]()). This model splits event extraction into two sub-tasks: trigger extraction and argument extraction, solved as two sequence labeling problems in a pipelined fashion.
 
-#### 基于序列标注的触发词识别模型
+#### Trigger extraction model based on sequence labeling (Tri-SeqL)
 
-基于序列标注的触发词抽取模型是整体模型的一部分，该部分主要是给定事件类型，识别句子中出现的事件触发词对应的位置以及对应的事件类别，该模型是基于ERNIE开发序列标注模型，采用ERNIE+CRF实现，模型原理图如下：
-
-<div align="center">
-<img src="pictures/trigger_model.png" width="500" height="400" alt="基于序列标注的触发词抽取模型" align=center />
-</div>
-
-> 上述样例中模型通过模型识别出触发词"求婚"，并分配给"B-结婚"、"I-结婚"标签，最终可以得到该句子中包含 “结婚”事件类型。
-
-#### 基于序列标注的论元角色识别模型
-
-基于序列标注的论元抽取模型也是整体模型的一部分，该部分主要是识别出事件中的论元以及对应论元角色，该模型是基于ERNIE开发序列标注模型，采用ERNIE+CRF实现，模型原理图如下：
+Trigger extraction aims to predict whether a token triggers an event. We formulates trigger extraction as a sequence labeling problem with labels indicate the event types. This model is built upon a pre-trained language model ERNIE combined with a CRF layer.
 
 <div align="center">
-<img src="pictures/role_model.png" width="500" height="400" alt="基于序列标注的论元抽取模型" align=center />
+<img src="pictures/trigger_model.png" width="600" height="500" alt="Trigger extraction model based on sequence labeling" align=center />
 </div>
 
-> 上述样例中模型通过模型识别出：1）论元"李荣浩"，并分配标签"B-求婚者"、"I-求婚者"、"I-求婚者"；2）论元"杨丞琳", 并分配标签"B-求婚对象"、"I-求婚对象"、"I-求婚对象"。最终识别出句子中包含的论元角色和论元对是<求婚者，李荣浩>、<求婚对象，杨丞琳>
+> For above example, the model recognizes the trigger "求婚" and assigns it to the label "B-结婚" "I-结婚", finally, we get event type is "结婚"。
 
-#### 识别结果处理策略
+#### Argument extraction model based on Sequence labeling (Arg-SeqL)
 
-根据触发词抽取模型识别到的事件类型对应的所有论元角色关联论元抽取模型的结果，得到最终模型的输出结果
+Argument extraction aims to extract arguments and corresponding argument roles they play. We formulates argument extraction as a sequence labeling problem with labels indicate the argument roles. This model is also built upon a pre-trained language model ERNIE combined with a CRF layer.
 
-## 快速开始
+<div align="center">
+<img src="pictures/role_model.png" width="600" height="500" alt="Argument extraction model based on Sequence labeling" align=center />
+</div>
 
-### 环境需求
+> For above example,  the model recognizes the arguments: 1) "李荣浩", assigns it labels "B-求婚者"、"I-求婚者" "I-求婚者"; 2) "杨丞琳", assigns it labels "B-求婚对象" "I-求婚对象" "I-求婚对象". Finally, we get argument roles and argument pairs is <求婚者, 李荣浩> <求婚对象, 杨丞琳>.
 
-- python适用版本 2.7.x（本代码测试时使用依赖见 `./requirements.txt` ）
-- paddlepaddle-gpu >= 1.5.0 请转至[paddlepaddle官网](https://www.paddlepaddle.org.cn/install/quick)按需求安装对应版本的paddlepaddle
 
-代码测试于单卡GPU Tesla K40m，CUDA版本 10.1，GPU Driver版本 418.39
+## Getting Started
 
-###### 依赖安装
+### Environment Requirements
+
+- python 2.7.x
+- paddlepaddle-gpu >= 1.5.0 (see more details about PaddlePaddle [PaddlePaddle Homepage](https://www.paddlepaddle.org.cn/install/quick))
+
+The code is tested on a single GPU Tesla K40m, with CUDA version=10.1, GPU Driver Version=418.39.
+
+###### Install dependencies
 
 ```
 pip install -r ./requirements.txt
 ```
 
-### 集成步骤
+### Integration steps
 
-##### 步骤1：训练数据处理
+##### Step 1: Data preparate
 
-包括下载预训练模型、数据处理成模型读入格式、处理事件schema生成触发词识别模型和论元角色识别模型需要的标签文档，对应详细步骤中的步骤1-3
+Including steps Download pre-trained ERNIE model、Examples process and Schmea process
 
 ```shell
 sh bin/script/data_preparation.sh
 ```
-重新执行需要删除部分文件（ `./model/ERNIE_1.0_max-len-512.tar.gz`、`./data/train.json`、`./data/dev.json`、`./data/test.json`、`./dict/vocab_trigger_label_map.txt`、`./dict/vocab_roles_label_map.txt`）否则相应的处理过程将不执行
 
-##### 步骤2: 训练模型并评估效果
+Re-executing this step requires delete files `./model/ERNIE_1.0_max-len-512.tar.gz`、`./data/train.json`、`./data/dev.json`、`./data/test.json`、`./dict/vocab_trigger_label_map.txt`、`./dict/vocab_roles_label_map.txt`
 
-包括触发词识别模型的训练和预测过程、论元角色识别模型的训练和预测过程、评估所需数据处理和进行评估，对应详细步骤中的步骤4-8
+##### Step 2: Train and results process
+
+Including steps train and predict results of Tri-SeqL、train and predict results of Arg-SeqL、Prediction results process.
 
 ```shell
 sh bin/script/train_and_eval.sh
 ```
 
-重新训练两个模型需要删除 `./save_model/trigger` 和 `./save_model/role` ，重新预测结果需要删除 `./save_model/trigger/pred_trigger.json` 和 `./save_model/role/pred_role.json`
+Re-executing this step requires delete files `./save_model/trigger`、`./save_model/role`、 `./save_model/trigger/pred_trigger.json` and `./save_model/role/pred_role.json`.
 
-### 详细步骤
+### Detailed steps
 
-##### 步骤1: 下载ERNIE预训练模型
+##### Step 1: Download pre-trained ERNIE model
 
 ```shell
-cd ./model  # 所有模型保存目录
+cd ./model
 wget https://ernie.bj.bcebos.com/ERNIE_1.0_max-len-512.tar.gz --no-check-certificate
-mkdir ERNIE_1.0_max-len-512  # ernie模型保存目录
+mkdir ERNIE_1.0_max-len-512
 tar -zxvf ERNIE_1.0_max-len-512.tar.gz -C ERNIE_1.0_max-len-512
 ```
+Download ERNIE1.0 Base（max-len-512）model and extract it into `./model/ERNIE_1.0_max-len-512/`
 
-在 `./model/ERNIE_1.0_max-len-512/` 目录下保存了预训练模型的参数文件目录( `params/`)、词汇表(`vocab.txt`)、模型配置(`ernie_config.json`)
 
-##### 步骤2: 处理样本数据
+##### Step 2: Examples process
 
-将原始格式的数据处理成模型读入所需要的格式，并随机划分训练集（80%）和测试集（20%），在 `./data/` 目录下创建 `train.json`、`dev.json`、`test.json` 文件
+
+Process examples into `./data/`, create files `train.json`、`dev.json` and `test.json`
 
 ```python
 python bin/data_process.py origin_events_process ./data/eet_events.json ./data/
 ```
 
-##### 步骤3: 处理schema生成序列标注标签文档
+##### Step 3: Schmea process
 
-- 触发词识别模型标签，保存到文件 `./dict/vocab_trigger_label_map.txt`
+- Trigger label process for Tri-SeqL and save file into `./dict/vocab_trigger_label_map.txt`
 
 ```python
 python bin/data_process.py schema_event_type_process ./dict/event_schema.json ./dict/vocab_trigger_label_map.txt
 ```
 
-- 论元角色识别模型标签，保存到文件 `./dict/vocab_roles_label_map.txt`
+- Argument Role Label for Arg-SeqL and save file into `./dict/vocab_roles_label_map.txt`
 
 ```python
 python bin/data_process.py schema_role_process ./dict/event_schema.json ./dict/vocab_roles_label_map.txt
 ```
 
-##### 步骤4: 训练触发词识别模型
-
-训练完成创建 `./save_model/trigger/final_model` 文件夹保存最终模型参数，每500步保存训练过程参数，测试集预测结果保存在 `./save_model/trigger/pred_trigger.json`
+##### Step 4: Train Tri-SeqL
 
 ```shell
 cd ./bin
@@ -118,9 +115,7 @@ sh script/train_event_trigger.sh ${GPUID} ${DATA_DIR} ${TRIGGER_SAVE_MODEL} ${PR
 
 ```
 
-##### 步骤5: 预测触发词结果
-
-，测试集预测结果保存在 `./save_model/trigger/pred_trigger.json`
+##### Step 5: Prediction Tri-SeqL
 
 ```shell
 cd ./bin
@@ -136,9 +131,7 @@ TRIGGER_SAVE_MODEL=${SAVE_MODEL}/trigger
 sh script/predict_event_trigger.sh ${GPUID} ${DATA_DIR} ${PRETRAIN_MODEL} ${TRIGGER_SAVE_MODEL}/final_model ${DICT}
 ```
 
-##### 步骤6: 训练论元角色识别模型
-
-训练完成创建 `./save_model/role/final_model` 文件夹保存最终模型参数，每500步保存训练过程参数，测试集预测结果保存在 `./save_model/role/pred_role.json`
+##### Step 6: Train Arg-SeqL
 
 ```shell
 cd ./bin
@@ -154,9 +147,7 @@ ROLE_SAVE_MODEL=${SAVE_MODEL}/role
 sh script/train_event_role.sh ${GPUID} ${DATA_DIR} ${ROLE_SAVE_MODEL} ${PRETRAIN_MODEL} ${DICT}
 ```
 
-##### 步骤7: 预测论元角色结果
-
-测试集预测结果保存在 `./save_model/role/pred_role.json`
+##### Step 7: Prediction Arg-SeqL
 
 ```shell
 cd ./bin
@@ -172,36 +163,26 @@ ROLE_SAVE_MODEL=${SAVE_MODEL}/role
 sh script/predict_event_role.sh ${GPUID} ${DATA_DIR} ${PRETRAIN_MODEL} ${ROLE_SAVE_MODEL}/final_model ${DICT}
 ```
 
-##### 步骤8: 评估
+##### step 8: Prediction results process
 
-- 将测试集（`./data/test.json`）转化为评估格式 `./result/gold.json`
+- Transform test set（`./data/test.json`）to evaluation format file `./result/gold.json`
 
 ```python
 python bin/predict_eval_process.py test_data_2_eval ./data/test.json ./result/gold.json
 ```
 
-- 将预测结果整合并转为评估格式
+- Integrate and transform prediction results into evaluation format
 
-需要触发词预测结果（`./save_model/trigger/pred_trigger.json`）、论元角色预测结果（`./save_model/role/pred_role.json`）、事件schema文件（`./dict/event_schema.json`）,保存到预测结果文件 `./result/pred.json`
+Integrate predict results file of Tri-SeqL（`./save_model/trigger/pred_trigger.json`）、predict results file of Arg-SeqL（`./save_model/role/pred_role.json`）、events schema file（`./dict/event_schema.json`）into  evaluation format file `./result/pred.json`
 
 ```python
 python bin/predict_eval_process.py predict_data_2_eval ./save_model/trigger/pred_trigger.json ./save_model/role/pred_role.json ./dict/event_schema.json ./result/pred.json
 ```
 
-- 效果评估
+# Evaluation
 
-1）将预测结果转为的评估格式文件提交到[事件抽取竞赛网站]()
+Zip your prediction json (`./result/pred.json`) file and submit it to official website [事件抽取竞赛网站]()
 
-2）实现评估方法，输入测试集和预测结果转化为评估格式的结果
+## Discussion
 
-## 测试
-
-暂无
-
-## 如何贡献
-
-提交issue，然后提交patch，说明关联的issue
-
-## 讨论
-
-1）如果您有任何疑问，可以在issue中提交问题，我们将定期答复。
+If you have any question, you can submit an issue in github and we will respond periodically.
