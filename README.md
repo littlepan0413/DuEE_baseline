@@ -2,7 +2,7 @@ English | [简体中文](./README.zh.md)
 
 # Event Extraction Baseline model (EE-Baseline)
 
-EE-Baseline is a event extraction baseline model for the event extraction dataset ([DuEE 1.0]()). This model splits event extraction into two sub-tasks: trigger extraction and argument extraction, solved as two sequence labeling problems in a pipelined fashion.
+EE-Baseline is a event extraction baseline model for the event extraction dataset DuEE 1.0. This model splits event extraction into two sub-tasks: trigger extraction and argument extraction, solved as two sequence labeling problems in a pipelined fashion.
 
 #### Trigger extraction model based on sequence labeling (Tri-SeqL)
 
@@ -42,7 +42,7 @@ pip install -r ./requirements.txt
 
 ### Integration steps
 
-##### Step 1: Data preparate
+##### Step 1: Data preparation
 
 Including steps Download pre-trained ERNIE model、Examples process and Schmea process
 
@@ -50,7 +50,7 @@ Including steps Download pre-trained ERNIE model、Examples process and Schmea p
 sh bin/script/data_preparation.sh
 ```
 
-Re-executing this step requires delete files `./model/ERNIE_1.0_max-len-512.tar.gz`、`./data/train.json`、`./data/dev.json`、`./data/test.json`、`./dict/vocab_trigger_label_map.txt`、`./dict/vocab_roles_label_map.txt`
+Re-executing this step requires deleting files `./model/ERNIE_1.0_max-len-512.tar.gz`、`./data/train.json`、`./data/dev.json`、`./data/test.json`、`./dict/vocab_trigger_label_map.txt`、`./dict/vocab_roles_label_map.txt`
 
 ##### Step 2: Train and results process
 
@@ -60,7 +60,7 @@ Including steps train and predict results of Tri-SeqL、train and predict result
 sh bin/script/train_and_eval.sh
 ```
 
-Re-executing this step requires delete files `./save_model/trigger`、`./save_model/role`、 `./save_model/trigger/pred_trigger.json` and `./save_model/role/pred_role.json`.
+Re-executing this step requires deleting files `./save_model/trigger`、`./save_model/role`、 `./save_model/trigger/pred_trigger.json` and `./save_model/role/pred_role.json`.
 
 ### Detailed steps
 
@@ -181,7 +181,7 @@ python bin/predict_eval_process.py predict_data_2_eval ./save_model/trigger/pred
 
 # Evaluation
 
-Zip your prediction json (`./result/pred.json`) file and submit it to official website [事件抽取竞赛网站]()
+Zip your prediction json (`./result/pred.json`) file and submit it to official website
 
 ## Discussion
 

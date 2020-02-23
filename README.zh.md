@@ -191,7 +191,7 @@ python bin/predict_eval_process.py predict_data_2_eval ./save_model/trigger/pred
 
 - 效果评估
 
-1）将预测结果转为的评估格式文件提交到[事件抽取竞赛网站]()
+1）将预测结果转为的评估格式文件提交到事件抽取竞赛网站
 
 2）实现评估方法，输入测试集和预测结果转化为评估格式的结果
 
