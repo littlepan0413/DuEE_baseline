@@ -6,16 +6,18 @@
 -  paddlepaddle-gpu >= 1.7.0、paddlehub >= 1.6.1
 -  请转至paddlepaddle官网按需求安装对应版本的paddlepaddle
 
-##### 依赖安装
+#### 依赖安装
 > pip install -r ./requirements.txt
 
-##### 模型下载&使用
+#### 模型下载&使用
 
+```
 hub install ernie_tiny==1.1.0
+```
 
-更多模型参考 [PaddleHub语义模型](https://www.paddlepaddle.org.cn/hublist?filter=en_category&value=LanguageModel)
+更多预训练模型参考 [PaddleHub语义模型](https://www.paddlepaddle.org.cn/hublist?filter=en_category&value=SemanticModel)
 
-使用时修改 sequence_label.py 中的 model_name = "ernie_tiny"
+**使用时修改 sequence_label.py 中的 model_name = "ernie_tiny"**
 
 ### 模型训练
 

@@ -86,7 +86,8 @@ class EEDataset(BaseNLPDataset):
 
 
 def main():
-    # Load Paddlehub ERNIE Tiny pretrained model
+    # Load Paddlehub pretrained model
+    # 更多预训练模型 https://www.paddlepaddle.org.cn/hublist?filter=en_category&value=SemanticModel
     #model_name = "ernie_tiny"
     model_name = "chinese-roberta-wwm-ext-large"
     module = hub.Module(name=model_name)
